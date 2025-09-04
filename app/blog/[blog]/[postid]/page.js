@@ -228,7 +228,7 @@ export async function generateMetadata(props) {
   if (!post) {
     return defaultMetadata;
   }
-
+  console.log(post, "post");
   // Extract data based on actual post structure
   const rawTitle = post?.title?.rendered || "Costa Rican Insurance - Blog";
   const title = stripHtml(rawTitle);
@@ -240,7 +240,7 @@ export async function generateMetadata(props) {
 
   // Use the existing slug from WordPress or create one
   const slug = post?.slug || createSlug(title);
-  const url = `https://costaseo.vercel.app/blog/${post.title.replace(
+  const url = `https://costaseo.vercel.app/blog/${post?.title?.rendered.replace(
     /\s+/g,
     "-"
   )}/${params.postid}`;
