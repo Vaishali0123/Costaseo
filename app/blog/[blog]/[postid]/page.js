@@ -469,14 +469,12 @@ export async function generateMetadata(props) {
     const numericPostId = decodeURIComponent(params.postid);
     const postid = decodePostId(numericPostId);
 
-    console.log("Processing postid:", postid);
-
     // If we can't decode the postid, return 404-like metadata
     if (!postid) {
-      console.log("Invalid postid, returning 404 metadata");
       return {
-        title: "Post Not Found - Costa Rican Insurance",
-        description: "The requested blog post could not be found.",
+        title: "Costa Rican Insurance",
+        description:
+          "Read Costa Rican Insurance blog - your trusted source for insurance information in Costa Rica.",
         robots: { index: false, follow: false },
       };
     }
@@ -484,24 +482,22 @@ export async function generateMetadata(props) {
     // Fetch post data
     const post = await getpostdetails(postid);
 
-    if (!post) {
-      console.log("Post not found in API, returning 404 metadata");
-      return {
-        title: "Post Not Found - Costa Rican Insurance",
-        description: "The requested blog post could not be found.",
-        robots: { index: false, follow: false },
-      };
-    }
-
-    console.log("Post found:", post.title?.rendered);
+    // if (!post) {
+    //   return {
+    //     title: "Costa Rican Insurance",
+    //     description:
+    //       "Read Costa Rican Insurance blog - your trusted source for insurance information in Costa Rica",
+    //     robots: { index: false, follow: false },
+    //   };
+    // }
 
     // Extract and clean title
     const rawTitle = post.title?.rendered;
     if (!rawTitle) {
-      console.log("No title found in post");
       return {
-        title: "Untitled Post - Costa Rican Insurance",
-        description: "Costa Rican Insurance blog post",
+        title: "Costa Rican Insurance",
+        description:
+          "Read Costa Rican Insurance blog - your trusted source for insurance information in Costa Rica.",
         robots: { index: false, follow: false },
       };
     }
@@ -527,8 +523,6 @@ export async function generateMetadata(props) {
     const keywords = [...new Set([...titleKeywords, ...baseKeywords])].join(
       ", "
     );
-
-    console.log("Generated metadata for:", title);
 
     return {
       title: title, // Use simple string instead of object
