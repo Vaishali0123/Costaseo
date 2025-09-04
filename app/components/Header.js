@@ -106,18 +106,18 @@ const Header = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        // const data = await graphQLClient.request(GET_HERO_AND_STATS);
-        let data = null;
-        const storedData = sessionStorage.getItem("data");
+        const data = await graphQLClient.request(GET_HERO_AND_STATS);
+        // let data = null;
+        // const storedData = sessionStorage.getItem("data");
 
-        if (storedData) {
-          // Parse stored data only once
-          data = JSON.parse(storedData);
-        } else {
-          // Fetch from API if no sessionStorage data
-          data = await graphQLClient.request(GET_HERO_AND_STATS);
-          sessionStorage.setItem("data", JSON.stringify(data));
-        }
+        // if (storedData) {
+        //   // Parse stored data only once
+        //   data = JSON.parse(storedData);
+        // } else {
+        //   // Fetch from API if no sessionStorage data
+        //   data = await graphQLClient.request(GET_HERO_AND_STATS);
+        //   sessionStorage.setItem("data", JSON.stringify(data));
+        // }
         data?.categories?.nodes?.forEach((category) => {
           if (category?.slug === "insurance") {
             setInsuranceTypes(category?.children.nodes);

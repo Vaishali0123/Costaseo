@@ -143,6 +143,9 @@ const BlogCard = ({
     }
     doTranslate();
   }, [language, title, description]);
+  function stripHtml(html) {
+    return html?.replace(/<[^>]*>?/gm, "") || "";
+  }
 
   return (
     <div
@@ -157,6 +160,14 @@ const BlogCard = ({
             latestposts,
           })
         );
+        document.cookie = `blogMeta=${encodeURIComponent(
+          JSON.stringify({
+            title,
+            slug: title.replace(/\s+/g, "-"),
+            postid,
+            description: stripHtml(content).replace(/\s+/g, " ").slice(0, 160),
+          })
+        )}; path=/; SameSite=Lax`;
         // console.log(postid, "postid");
         // No new tab
         window.open(`/blog/${title.replace(/\s+/g, "-")}/${postid}`, "_self");
