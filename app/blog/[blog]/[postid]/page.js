@@ -180,7 +180,10 @@ import BlogClient from "../BlogClient";
 
 function decodePostId(postId) {
   if (!postId) return null;
-  if (typeof postId === "number") return postId;
+  if (/^\d+$/.test(postId)) {
+    return Number(postId);
+  }
+  // if (typeof postId === "number") return postId;
 
   try {
     const decoded = atob(postId); // base64 → "post:143"
@@ -220,7 +223,7 @@ export async function generateMetadata(props) {
       follow: true,
     },
   };
-
+  console.log(postid, "postid");
   const post = await getpostdetails(postid);
   if (!post) {
     return defaultMetadata;
@@ -237,7 +240,10 @@ export async function generateMetadata(props) {
 
   // Use the existing slug from WordPress or create one
   const slug = post?.slug || createSlug(title);
-  const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
+  const url = `https://costaseo.vercel.app/blog/${post.title.replace(
+    /\s+/g,
+    "-"
+  )}/${params.postid}`;
 
   // Handle featured media - it's just an ID, you might need to fetch the actual image
   // For now, we'll use a default or construct the image URL if you have a pattern
@@ -249,7 +255,7 @@ export async function generateMetadata(props) {
   const featuredImage = defaultImage; // Update this when you have image URL logic
 
   return {
-    // ✅ FIXED: Proper title structure for Next.js
+    //  FIXED: Proper title structure for Next.js
     title: {
       absolute: title, // This ensures the exact title is used without template
     },
