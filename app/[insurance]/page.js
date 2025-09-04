@@ -144,7 +144,7 @@ export default function Page({ params }) {
 
     fetchData();
   }, []);
-  console.log(blog, "blog");
+
   return (
     <>
       <div className="bg-white dark:bg-black/10 min-h-screen">
