@@ -182,7 +182,7 @@ const BlogCard = ({
       {/* === Image Container === */}
       <div style={imageContainerStyle}>
         {image ? (
-          <img src={image} alt={title} style={imageStyle} />
+          <img loading="lazy" src={image} alt={title} style={imageStyle} />
         ) : (
           <span style={{ color: "white", fontSize: "18px", fontWeight: 500 }}>
             Image Here

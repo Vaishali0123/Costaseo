@@ -114,7 +114,6 @@ const Page = () => {
     }
   }, []);
   const content = blogData?.content;
-  console.log(blogData, "blogData");
   const title = translatedTitle || blogData?.title;
   const image = blogData?.image;
   const latestposts = translatedPosts.length
@@ -467,8 +466,8 @@ const Page = () => {
                   <div className="p-6 relative">
                     <h4
                       className="font-bold text-gray-800 dark:text-gray-200 mb-2 
-                       transition-colors duration-200 group-hover:text-blue-600 
-                       dark:group-hover:text-blue-400"
+                       transition-colors duration-200 group-hover:text-orange-600 
+                       dark:group-hover:text-orange-400"
                     >
                       {cat?.title}
                     </h4>
@@ -479,7 +478,7 @@ const Page = () => {
                     >
                       {stripHtml(cat?.content)?.slice(0, 100) + "... "}
                       <span
-                        className="text-blue-600 dark:text-blue-400 font-medium 
+                        className="text-orange-600 dark:text-orange-400 font-medium 
                            transition-all duration-200 group-hover:underline 
                            group-hover:underline-offset-2"
                       >
@@ -488,7 +487,7 @@ const Page = () => {
                     </p>
                     <div
                       className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r 
-                        from-blue-500 to-purple-500 transition-all duration-500 
+                        from-yellow-500 to-orange-500 transition-all duration-500 
                         group-hover:w-full"
                     />
                   </div>

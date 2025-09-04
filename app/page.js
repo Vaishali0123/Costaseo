@@ -38,8 +38,17 @@ const Page = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await graphQLClient.request(GET_HERO_AND_STATS);
+        let data = null;
+        const storedData = sessionStorage.getItem("data");
 
+        if (storedData) {
+          // Parse stored data only once
+          data = JSON.parse(storedData);
+        } else {
+          // Fetch from API if no sessionStorage data
+          data = await graphQLClient.request(GET_HERO_AND_STATS);
+          sessionStorage.setItem("data", JSON.stringify(data));
+        }
         // const sortedPosts = [...data.posts.nodes].sort(
         //   (a, b) => new Date(b.date) - new Date(a.date)
         // );

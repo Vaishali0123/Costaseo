@@ -9,84 +9,11 @@ import HeadSection from "./components/HeadSection";
 import BlogHome from "./components/BlogHome";
 import FeaturedPost from "./components/FeaturedPost";
 import ArticleCard from "./components/Card";
+import { GET_HERO_AND_STATS, graphQLClient } from "../lib/utils";
 function stripHtml(html) {
   return html.replace(/<[^>]*>?/gm, "");
 }
 
-const graphQLClient = new GraphQLClient(
-  "https://admin.costaricaninsurance.com/graphql",
-  {
-    headers: { "Content-Type": "application/json" },
-  }
-);
-
-const GET_HERO_AND_STATS = gql`
-  query GetAllCategoriesWithPosts {
-    categories(first: 100) {
-      nodes {
-        id
-        name
-        slug
-        posts(first: 100) {
-          nodes {
-            id
-            title
-            content
-            date
-            modified
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
-          }
-        }
-        children(first: 100) {
-          nodes {
-            id
-            name
-            slug
-            posts(first: 100) {
-              nodes {
-                id
-                title
-                content
-                date
-                modified
-                featuredImage {
-                  node {
-                    sourceUrl
-                  }
-                }
-              }
-            }
-            children(first: 100) {
-              nodes {
-                id
-                name
-                slug
-                posts(first: 100) {
-                  nodes {
-                    id
-                    title
-                    content
-                    date
-                    modified
-                    featuredImage {
-                      node {
-                        sourceUrl
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 export default function Page({ params }) {
   const { insurance } = React.use(params);
 
@@ -96,27 +23,19 @@ export default function Page({ params }) {
   const [typeData, setTypeData] = useState(null);
   const [blog, setBlog] = useState({});
 
-  // useEffect(() => {
-  //   const storedType = sessionStorage.getItem("selectedType");
-
-  //   if (storedType) {
-  //     setTypeData(JSON.parse(storedType));
-  //     setBlog(JSON.parse(storedType));
-  //     setLoading(false);
-  //     // sessionStorage.removeItem("selectedType"); // Clean up
-  //   }
-  // }, []);
   useEffect(() => {
     setRandomTop(Math.floor(Math.random() * 3)); // 0 to 2
     setRandomBottom(Math.floor(Math.random() * 3)); // 0 or 1
   }, []);
   const [insurancedata, setInsurancedata] = useState([]);
-  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await graphQLClient.request(GET_HERO_AND_STATS);
+        const data = sessionStorage.getItem("data")
+          ? JSON.parse(sessionStorage.getItem("data"))
+          : await graphQLClient.request(GET_HERO_AND_STATS);
+        // const data = await graphQLClient.request(GET_HERO_AND_STATS);
 
         // Flatten posts from all categories
         const allPosts = data.categories.nodes.flatMap((category) =>
@@ -131,7 +50,7 @@ export default function Page({ params }) {
         setInsurancedata(allPosts); // use for rendering BlogCard
         data?.categories?.nodes?.forEach((category) => {
           if (category?.slug.toString() === insurance.toString()) {
-            setCards(category?.children?.nodes);
+            // setCards(category?.children?.nodes);
             setBlog(category);
           }
         });

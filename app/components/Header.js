@@ -106,8 +106,18 @@ const Header = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await graphQLClient.request(GET_HERO_AND_STATS);
+        // const data = await graphQLClient.request(GET_HERO_AND_STATS);
+        let data = null;
+        const storedData = sessionStorage.getItem("data");
 
+        if (storedData) {
+          // Parse stored data only once
+          data = JSON.parse(storedData);
+        } else {
+          // Fetch from API if no sessionStorage data
+          data = await graphQLClient.request(GET_HERO_AND_STATS);
+          sessionStorage.setItem("data", JSON.stringify(data));
+        }
         data?.categories?.nodes?.forEach((category) => {
           if (category?.slug === "insurance") {
             setInsuranceTypes(category?.children.nodes);
@@ -256,8 +266,9 @@ const Header = () => {
                               "selectedType",
                               JSON.stringify(type)
                             );
-                            setMenu(!menu);
+
                             router.push(`/${type?.slug}`);
+                            setMenu(!menu);
                           }}
                           onMouseEnter={() => setActiveType(i)}
                           className={`px-4 py-2 rounded-lg cursor-pointer text-sm font-medium transition-all duration-200 ${
