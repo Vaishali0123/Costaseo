@@ -146,7 +146,8 @@ const BlogCard = ({
   function stripHtml(html) {
     return html?.replace(/<[^>]*>?/gm, "") || "";
   }
-
+  const encodedTitle = encodeURIComponent(title);
+  const encodedDesc = encodeURIComponent(description);
   return (
     <div
       onClick={() => {
@@ -162,7 +163,14 @@ const BlogCard = ({
         );
 
         // No new tab
-        window.open(`/blog/${title.replace(/\s+/g, "-")}/${postid}`, "_self");
+        // window.open(`/blog/${title.replace(/\s+/g, "-")}/${postid}`, "_self");
+        window.open(
+          `/blog/${title.replace(
+            /\s+/g,
+            "-"
+          )}/${postid}?title=${encodedTitle}&desc=${encodedDesc}`,
+          "_self"
+        );
       }}
       // href={{
       //   pathname: "/blog",
