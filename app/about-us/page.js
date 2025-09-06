@@ -129,7 +129,7 @@ const Index = () => {
         {/* <FloatingCards /> */}
         <GraphicElements />
 
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className=" px-4 text-center relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="inline-block mb-4 ">
               <span className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-100 dark:to-orange-200 dark:text-gray-900 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse">
@@ -168,7 +168,7 @@ const Index = () => {
 
       {/* Key Benefits */}
       <section className="py-16 bg-white/50 dark:bg-black/10  backdrop-blur-sm relative">
-        <div className="container mx-auto px-4">
+        <div className=" px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold font-[marcellus] text-gray-900 dark:text-gray-100  mb-4 bg-gradient-to-r dark:from-gray-100 dark:to-gray-200 from-gray-900 to-orange-700 bg-clip-text text-transparent">
               {translations.whyChoose || texts.whyChoose}
@@ -237,7 +237,7 @@ const Index = () => {
             <div className="absolute bottom-20 left-20 w-24 h-24 border-4 border-orange-400 rotate-45 animate-pulse"></div>
           </div>
 
-          <div className="container mx-auto px-4 relative z-10">
+          <div className=" px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center">
               <h3 className="text-4xl font-bold mb-6 font-[marcellus] dark:from-gray-100 dark:to-orange-300 bg-gradient-to-r from-gray-900 to-orange-700 bg-clip-text text-transparent">
                 {translations.aboutTitle || texts.aboutTitle}
@@ -268,7 +268,7 @@ const Index = () => {
         id="services"
         className="py-16 bg-white/80 dark:bg-black/20 backdrop-blur-sm"
       >
-        <div className="container mx-auto px-4">
+        <div className=" px-4">
           <div className="text-center mb-10">
             <h3 className="text-3xl font-bold font-[marcellus] dark:text-gray-200 text-gray-900 mb-3">
               {translations.offerTitle || texts.offerTitle}
@@ -411,7 +411,7 @@ const Index = () => {
         id="who-we-help"
         className="py-16 bg-gradient-to-r dark:from-orange-800 dark:to-black from-gray-50 to-orange-50/30"
       >
-        <div className="container mx-auto px-4">
+        <div className=" px-4">
           <div className="text-center mb-10">
             <h3 className="text-3xl font-[marcellus] font-bold dark:text-gray-100  text-gray-900 mb-3">
               {translations.whoTitle || "Who We Help"}
