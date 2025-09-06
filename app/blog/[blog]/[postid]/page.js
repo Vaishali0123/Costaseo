@@ -529,10 +529,11 @@ export async function generateMetadata(props) {
 
     const url = `https://costaseo.vercel.app/blog/${urlSlug}/${params.postid}`;
 
-    // Handle featured media
-    const featuredMediaId = post?.featured_media;
-    const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
-    const featuredImage = defaultImage; // Update this when you have image URL logic
+    // Handle featured media with improved logic
+    const featuredImageUrl =
+      getFeaturedImageUrl(post) ||
+      "https://costaseo.vercel.app/default-blog-image.jpg";
+    const featuredImage = featuredImageUrl;
 
     const metadata = {
       title: {
