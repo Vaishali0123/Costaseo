@@ -421,30 +421,52 @@
 //     </>
 //   );
 // }
-import { getpostdetails } from "../../../lib/text";
+import {
+  getpostdetails,
+  getpostdetailsWithParams,
+  getFeaturedImageUrl,
+} from "../../../lib/text";
 import BlogClient from "../BlogClient";
 
 function decodePostId(postId) {
-  if (!postId) return null;
+  console.log("🔍 Decoding postId:", postId);
+
+  if (!postId) {
+    console.log("❌ No postId provided");
+    return null;
+  }
+
   if (/^\d+$/.test(postId)) {
-    return Number(postId);
+    const numericId = Number(postId);
+    console.log("✅ Direct numeric ID:", numericId);
+    return numericId;
   }
 
   try {
-    const decoded = atob(postId); // base64 → "post:143"
+    const decoded = atob(postId);
+    console.log("🔓 Base64 decoded:", decoded);
+
     const parts = decoded.split(":");
+    console.log("📝 Split parts:", parts);
+
     const numeric = Number(parts.pop());
-    return isNaN(numeric) ? null : numeric;
-  } catch {
+    const result = isNaN(numeric) ? null : numeric;
+    console.log("🎯 Final numeric ID:", result);
+
+    return result;
+  } catch (error) {
+    console.error("❌ Base64 decode error:", error);
     return null;
   }
 }
 
 function stripHtml(html) {
-  return html?.replace(/<[^>]*>?/gm, "") || "";
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, "").trim();
 }
 
 function createSlug(title) {
+  if (!title) return "";
   return title
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
@@ -453,91 +475,117 @@ function createSlug(title) {
 }
 
 export async function generateMetadata(props) {
-  const params = await props.params;
-  const numericPostId = decodeURIComponent(params.postid);
-  const postid = decodePostId(numericPostId);
+  console.log("🚀 generateMetadata started");
 
-  // Default metadata for when post is not found - ONLY use as last resort
+  const params = await props.params; // Await params properly
+  console.log("📋 Route params:", params);
+
+  const numericPostId = decodeURIComponent(params.postid);
+  console.log("🔗 Decoded URL postid:", numericPostId);
+
+  const postid = decodePostId(numericPostId);
+  console.log("🆔 Final post ID:", postid);
+
+  // Default metadata for when post is not found
   const defaultMetadata = {
     title: "Costa Rican Insurance - Blog",
     description:
       "Read the latest blog posts from Costa Rican Insurance about insurance solutions in Costa Rica.",
     alternates: { canonical: "https://costaseo.vercel.app" },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: true, follow: true },
   };
 
+  if (!postid) {
+    console.error("💥 Invalid post ID, using default metadata");
+    return defaultMetadata;
+  }
+
   try {
-    // Add error handling and logging
-    console.log("Fetching post details for ID:", postid);
-    const post = await getpostdetails(postid);
+    console.log("📡 Fetching post data...");
+
+    // Try with embedded data first for better featured images
+    let post = await getpostdetailsWithParams(postid, { _embed: true });
+
+    // Fallback to basic fetch if embedded fails
+    if (!post) {
+      console.log("🔄 Fallback to basic post fetch");
+      post = await getpostdetails(postid);
+    }
 
     if (!post) {
-      console.error("Post not found for ID:", postid);
+      console.error("📭 No post data received, using default metadata");
       return defaultMetadata;
     }
 
-    console.log("Post data received:", {
-      title: post?.title?.rendered,
-      excerpt: post?.excerpt?.rendered,
-      slug: post?.slug,
+    console.log("🔬 Post data structure analysis:", {
+      id: post.id,
+      titleRendered: post.title?.rendered,
+      excerptRendered: post.excerpt?.rendered ? "Present" : "Missing",
+      slug: post.slug,
+      status: post.status,
     });
 
-    // Extract and clean title
-    const rawTitle = post?.title?.rendered;
+    // Extract title with validation
+    const rawTitle = post.title?.rendered;
     if (!rawTitle) {
-      console.error("No title found in post data");
+      console.error("❌ No title found in post data, using default");
       return defaultMetadata;
     }
 
     const cleanTitle = stripHtml(rawTitle).trim();
     if (!cleanTitle) {
-      console.error("Title is empty after cleaning");
+      console.error("❌ Title is empty after cleaning, using default");
       return defaultMetadata;
     }
 
-    // Extract and clean description
+    console.log("🏷️ Final clean title:", cleanTitle);
+
+    // Extract description with multiple fallback strategies
     let description = "";
-    if (post?.excerpt?.rendered) {
+
+    if (post.excerpt?.rendered) {
       description = stripHtml(post.excerpt.rendered)
         .replace(/\[&hellip;\]/g, "...")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 160);
-    } else if (post?.content?.rendered) {
-      // Fallback to content if no excerpt
+      console.log("📝 Description from excerpt");
+    } else if (post.content?.rendered) {
       description = stripHtml(post.content.rendered)
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 160);
+      console.log("📝 Description from content");
     }
 
-    // If still no description, create one from title
-    if (!description) {
-      description = `Learn about ${cleanTitle.toLowerCase()} with Costa Rican Insurance.`;
+    // Final fallback for description
+    if (!description || description.length < 10) {
+      description = `Learn about ${cleanTitle.toLowerCase()} - comprehensive insurance information from Costa Rican Insurance.`;
+      console.log("📝 Using generated description");
     }
 
-    // Use the existing slug from WordPress or create one from title
-    const slug = post?.slug || createSlug(cleanTitle);
+    console.log("📄 Final description:", description);
 
-    // Fix URL construction - use the slug from the URL params instead of replacing spaces
-    const urlSlug = params.postid.includes("/")
-      ? params.postid.split("/")[0]
-      : createSlug(cleanTitle);
+    // Use the existing slug from WordPress or create one
+    const slug = post.slug || createSlug(cleanTitle);
 
-    const url = `https://costaseo.vercel.app/blog/${urlSlug}/${params.postid}`;
+    // Build canonical URL using the slug from the URL path if available
+    const urlParts = params.postid.includes("/")
+      ? params.postid.split("/")
+      : [];
+    const slugFromUrl = urlParts.length > 0 ? urlParts[0] : slug;
+    const url = `https://costaseo.vercel.app/blog/${slugFromUrl}/${numericPostId}`;
+
+    console.log("🔗 Generated canonical URL:", url);
 
     // Handle featured media with improved logic
     const featuredImageUrl =
       getFeaturedImageUrl(post) ||
       "https://costaseo.vercel.app/default-blog-image.jpg";
-    const featuredImage = featuredImageUrl;
 
     const metadata = {
       title: {
-        absolute: cleanTitle, // Use the clean title without fallback
+        absolute: cleanTitle, // This ensures the exact title is used without template
       },
       description,
 
@@ -567,7 +615,7 @@ export async function generateMetadata(props) {
         tags: post?.tags?.map((tag) => tag.name) || ["insurance", "Costa Rica"],
         images: [
           {
-            url: featuredImage,
+            url: featuredImageUrl,
             width: 1200,
             height: 630,
             alt: cleanTitle,
@@ -583,7 +631,7 @@ export async function generateMetadata(props) {
         description,
         creator: "@costaricanins",
         site: "@costaricanins",
-        images: [featuredImage],
+        images: [featuredImageUrl],
       },
 
       // Robots meta
@@ -609,110 +657,119 @@ export async function generateMetadata(props) {
       },
     };
 
-    console.log("Generated metadata:", metadata);
+    console.log("✅ Generated metadata successfully:", {
+      title: metadata.title.absolute,
+      descriptionLength: metadata.description.length,
+      canonicalUrl: metadata.alternates.canonical,
+    });
+
     return metadata;
   } catch (error) {
-    console.error("Error generating metadata:", error);
+    console.error("💥 Error in generateMetadata:", error);
     return defaultMetadata;
   }
 }
 
-export default async function Page({ params }) {
+export default async function Page(props) {
+  console.log("🎬 Page component started");
+
+  const params = await props.params; // Await params properly
   const numericPostId = decodeURIComponent(params.postid);
   const postid = decodePostId(numericPostId);
 
+  let post = null;
+
   try {
-    const post = await getpostdetails(postid);
-
-    // Generate structured data for this specific post
-    const generateStructuredData = () => {
-      if (!post) return null;
-
-      const title = stripHtml(post.title?.rendered || "");
-      const description = stripHtml(post.excerpt?.rendered || "")
-        .replace(/\[&hellip;\]/g, "...")
-        .slice(0, 160);
-
-      const slug = post?.slug || createSlug(title);
-      const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
-      const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
-
-      // Get word count from content
-      const contentText = stripHtml(post?.content?.rendered || "");
-      const wordCount = contentText
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length;
-
-      return {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "@id": url,
-        headline: title,
-        description,
-        image: {
-          "@type": "ImageObject",
-          url: defaultImage,
-          width: 1200,
-          height: 630,
-        },
-        datePublished: post.date,
-        dateModified: post.modified,
-        author: {
-          "@type": "Organization",
-          name: "Costa Rican Insurance",
-          url: "https://costaricaninsurance.com",
-          logo: {
-            "@type": "ImageObject",
-            url: "https://costaricaninsurance.com/logo.png",
-            width: 200,
-            height: 60,
-          },
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "Costa Rican Insurance",
-          url: "https://costaricaninsurance.com",
-          logo: {
-            "@type": "ImageObject",
-            url: "https://costaricaninsurance.com/logo.png",
-            width: 200,
-            height: 60,
-          },
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": url,
-        },
-        articleSection: "Insurance",
-        keywords: "insurance, Costa Rica, mortgage, property, qualify",
-        wordCount: wordCount,
-        articleBody:
-          contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
-        inLanguage: "en-US",
-        isAccessibleForFree: true,
-      };
-    };
-
-    const structuredData = generateStructuredData();
-
-    return (
-      <>
-        {/* Structured Data (JSON-LD) */}
-        {structuredData && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(structuredData),
-            }}
-          />
-        )}
-
-        {/* Main Content */}
-        <BlogClient postid={params.postid} />
-      </>
-    );
+    post = await getpostdetails(postid);
   } catch (error) {
-    console.error("Error loading page:", error);
-    return <BlogClient postid={params.postid} />;
+    console.error("💥 Error loading post in Page component:", error);
   }
+
+  // Generate structured data for this specific post
+  const generateStructuredData = () => {
+    if (!post) return null;
+
+    const title = stripHtml(post.title?.rendered || "");
+    const description = stripHtml(post.excerpt?.rendered || "")
+      .replace(/\[&hellip;\]/g, "...")
+      .slice(0, 160);
+
+    const slug = post?.slug || createSlug(title);
+    const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
+    const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
+
+    // Get word count from content
+    const contentText = stripHtml(post?.content?.rendered || "");
+    const wordCount = contentText
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": url,
+      headline: title,
+      description,
+      image: {
+        "@type": "ImageObject",
+        url: defaultImage,
+        width: 1200,
+        height: 630,
+      },
+      datePublished: post.date,
+      dateModified: post.modified,
+      author: {
+        "@type": "Organization",
+        name: "Costa Rican Insurance",
+        url: "https://costaricaninsurance.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://costaricaninsurance.com/logo.png",
+          width: 200,
+          height: 60,
+        },
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Costa Rican Insurance",
+        url: "https://costaricaninsurance.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://costaricaninsurance.com/logo.png",
+          width: 200,
+          height: 60,
+        },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": url,
+      },
+      articleSection: "Insurance",
+      keywords: "insurance, Costa Rica, mortgage, property, qualify",
+      wordCount: wordCount,
+      articleBody:
+        contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
+      inLanguage: "en-US",
+      isAccessibleForFree: true,
+    };
+  };
+
+  const structuredData = generateStructuredData();
+
+  return (
+    <>
+      {/* Structured Data (JSON-LD) */}
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+      )}
+
+      {/* Main Content */}
+      <BlogClient postid={params.postid} />
+    </>
+  );
 }

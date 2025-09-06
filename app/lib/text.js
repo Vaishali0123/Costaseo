@@ -47,7 +47,7 @@ export async function getpostdetails(postid) {
   }
 
   try {
-    console.log(`Fetching post details for ID: ${numericPostId}`);
+    console.log(`🔍 Fetching post details for ID: ${numericPostId}`);
 
     // Add timeout to prevent hanging requests
     const controller = new AbortController();
@@ -69,16 +69,16 @@ export async function getpostdetails(postid) {
     // Handle different HTTP status codes
     if (!res.ok) {
       if (res.status === 404) {
-        console.error(`Post not found: ${numericPostId}`);
+        console.error(`❌ Post not found: ${numericPostId}`);
         return null;
       }
       if (res.status === 403) {
-        console.error(`Access forbidden for post: ${numericPostId}`);
+        console.error(`🚫 Access forbidden for post: ${numericPostId}`);
         return null;
       }
       if (res.status >= 500) {
         console.error(
-          `Server error (${res.status}) for post: ${numericPostId}`
+          `💥 Server error (${res.status}) for post: ${numericPostId}`
         );
         return null;
       }
@@ -89,14 +89,15 @@ export async function getpostdetails(postid) {
 
     // Validate the response structure
     if (!post || typeof post !== "object") {
-      console.error("Invalid post data structure received");
+      console.error("❌ Invalid post data structure received");
       return null;
     }
 
     // Log what we received for debugging
-    console.log(`Post ${numericPostId} data:`, {
+    console.log(`✅ Post ${numericPostId} data:`, {
       id: post.id,
       title: post.title?.rendered ? "Present" : "Missing",
+      titleValue: post.title?.rendered || "N/A",
       excerpt: post.excerpt?.rendered ? "Present" : "Missing",
       content: post.content?.rendered ? "Present" : "Missing",
       slug: post.slug || "Missing",
@@ -107,24 +108,24 @@ export async function getpostdetails(postid) {
 
     // Additional validation for required fields
     if (!post.title?.rendered) {
-      console.warn(`Post ${numericPostId} has no title`);
+      console.warn(`⚠️ Post ${numericPostId} has no title`);
     }
 
     if (!post.content?.rendered && !post.excerpt?.rendered) {
-      console.warn(`Post ${numericPostId} has no content or excerpt`);
+      console.warn(`⚠️ Post ${numericPostId} has no content or excerpt`);
     }
 
     return post;
   } catch (error) {
     if (error.name === "AbortError") {
-      console.error(`Request timeout for post ${numericPostId}`);
+      console.error(`⏰ Request timeout for post ${numericPostId}`);
     } else if (error.name === "TypeError" && error.message.includes("fetch")) {
       console.error(
-        `Network error fetching post ${numericPostId}:`,
+        `🌐 Network error fetching post ${numericPostId}:`,
         error.message
       );
     } else {
-      console.error(`Error fetching post ${numericPostId}:`, error.message);
+      console.error(`💥 Error fetching post ${numericPostId}:`, error.message);
     }
     return null;
   }
@@ -160,7 +161,7 @@ export async function getpostdetailsWithParams(postid, params = {}) {
     clearTimeout(timeoutId);
 
     if (!res.ok) {
-      console.error(`Failed to fetch post with params: ${res.status}`);
+      console.error(`❌ Failed to fetch post with params: ${res.status}`);
       return null;
     }
 
@@ -169,7 +170,7 @@ export async function getpostdetailsWithParams(postid, params = {}) {
     // With _embed=true, you'll get featured media details
     if (post._embedded?.["wp:featuredmedia"]?.[0]) {
       post.featured_media_details = post._embedded["wp:featuredmedia"][0];
-      console.log(`Featured media found for post ${numericPostId}:`, {
+      console.log(`🖼️ Featured media found for post ${numericPostId}:`, {
         id: post.featured_media_details.id,
         source_url: post.featured_media_details.source_url,
         alt_text: post.featured_media_details.alt_text,
@@ -179,7 +180,7 @@ export async function getpostdetailsWithParams(postid, params = {}) {
     return post;
   } catch (error) {
     console.error(
-      `Error fetching post ${numericPostId} with params:`,
+      `💥 Error fetching post ${numericPostId} with params:`,
       error.message
     );
     return null;
