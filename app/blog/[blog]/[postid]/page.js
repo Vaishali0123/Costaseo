@@ -211,10 +211,13 @@ export async function generateMetadata(props) {
   const params = await props.params;
   console.log(params, "params");
   const { blog } = params;
-  const blogTitle = decodeURIComponent(blog.replace(/-/g, " "));
-  console.log(blogTitle, "blogTitle");
+
   const numericPostId = decodeURIComponent(params.postid);
   const postid = decodePostId(numericPostId);
+  const post = postid ? await getpostdetails(postid) : null;
+  const blogTitle = post?.title?.rendered
+    ? post?.title?.rendered
+    : decodeURIComponent(blog.replace(/-/g, " "));
 
   postID = postid;
   // Default metadata for when post is not found
@@ -229,21 +232,21 @@ export async function generateMetadata(props) {
     },
   };
 
-  const post = await getpostdetails(postid);
-  if (!post) {
-    return defaultMetadata;
-  }
+  // if (!post) {
+  //   return defaultMetadata;
+  // }
   // Extract data based on actual post structure
-  const title = blogTitle;
+
   const description =
-    stripHtml(post || "")
+    stripHtml(post?.content?.rendered || "")
       .replace(/\[&hellip;\]/g, "...")
       .slice(0, 160) ||
     "Read the latest blog from Costa Rican Insurance about insurance solutions in Costa Rica.";
 
-  const url = `https://costaseo.vercel.app/blog/${title.replace(/\s+/g, "-")}/${
-    params.postid
-  }`;
+  const url = `https://costaseo.vercel.app/blog/${blogTitle.replace(
+    /\s+/g,
+    "-"
+  )}/${params.postid}`;
 
   const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
 
@@ -271,7 +274,7 @@ export async function generateMetadata(props) {
 
     // OpenGraph meta tags
     openGraph: {
-      title,
+      title: blogTitle,
       description,
       url,
       siteName: "Costa Rican Insurance",
@@ -287,7 +290,7 @@ export async function generateMetadata(props) {
           url: featuredImage,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: blogTitle,
           type: "image/jpeg",
         },
       ],
@@ -296,7 +299,7 @@ export async function generateMetadata(props) {
     // Twitter Card
     twitter: {
       card: "summary_large_image",
-      title,
+      title: blogTitle,
       description,
       creator: "@costaricanins",
       site: "@costaricanins",

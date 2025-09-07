@@ -17,13 +17,15 @@ export async function translateText(text, targetLang) {
 }
 
 export async function getpostdetails(postid) {
+  console.log(postid, "postid");
   try {
     const res = await fetch(
       `https://admin.costaricaninsurance.com/wp-json/wp/v2/posts/${postid}`
     );
     if (!res.ok) throw new Error(`Failed to fetch post: ${res.status}`);
     const data = await res.json();
-    return data?.content?.rendered || null;
+    console.log(data, "data");
+    return data;
     // return response.data; // { id, title, content, excerpt, author, date, ... }
   } catch (error) {
     console.error(

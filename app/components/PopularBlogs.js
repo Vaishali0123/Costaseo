@@ -88,7 +88,7 @@ const PopularBlogs = ({ mortgagesdata }) => {
 
   const displayData =
     translatedData.length > 0 ? translatedData : mortgagesdata;
-  console.log(displayData, "displayData");
+
   return (
     <div className="flex flex-col items-center  px-6 py-16 font-sans">
       {/* Header */}
