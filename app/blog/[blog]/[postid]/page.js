@@ -423,7 +423,7 @@
 //   );
 // }
 import { getpostdetails } from "../../../lib/text";
-
+import BlogClient from "../BlogClient";
 function decodePostId(postId) {
   if (!postId) return null;
   if (/^\d+$/.test(postId)) return Number(postId);
@@ -443,9 +443,9 @@ function stripHtml(html) {
 }
 
 export async function generateMetadata({ params }) {
-  const { blog, postid: encodedPostId } = params;
+  const { blog, postid } = params;
 
-  const postId = decodePostId(decodeURIComponent(encodedPostId));
+  const postId = decodePostId(decodeURIComponent(postid));
   const post = postId ? await getpostdetails(postId) : null;
 
   const blogTitle = post?.title?.rendered
@@ -460,7 +460,7 @@ export async function generateMetadata({ params }) {
 
   const url = `https://costaseo.vercel.app/blog/${blogTitle
     .replace(/\s+/g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "")}/${encodedPostId}`;
+    .replace(/[^a-zA-Z0-9-]/g, "")}/${postid}`;
 
   const featuredImage =
     post?.featured_media_url ||
@@ -507,7 +507,7 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const numericPostId = decodeURIComponent(params.postid);
   const postid = decodePostId(numericPostId);
-  const post = await getpostdetails(postID);
+  const post = await getpostdetails(postid);
 
   // Generate structured data for this specific post
   const generateStructuredData = () => {
