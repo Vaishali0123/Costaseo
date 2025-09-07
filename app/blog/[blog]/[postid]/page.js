@@ -439,7 +439,18 @@ function decodePostId(postId) {
 }
 
 function stripHtml(html) {
-  return html?.replace(/<[^>]*>?/gm, "") || "";
+  if (!html) return "";
+
+  return (
+    html
+      // Remove images, videos, iframes, scripts, styles completely
+      .replace(/<(img|iframe|video|script|style)[^>]*>/gi, "")
+      // Replace remaining HTML tags with space
+      .replace(/<[^>]+>/g, " ")
+      // Collapse multiple spaces/newlines
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 export async function generateMetadata({ params }) {
@@ -449,14 +460,18 @@ export async function generateMetadata({ params }) {
   const post = postId ? await getpostdetails(postId) : null;
 
   const blogTitle = post?.title?.rendered
-    ? stripHtml(post.title.rendered)
+    ? post.title.rendered
     : decodeURIComponent(blog.replace(/-/g, " "));
 
-  const description =
-    stripHtml(post?.content?.rendered)
-      .replace(/\[&hellip;\]/g, "...")
-      .slice(0, 160) ||
-    "Read the latest blog from Costa Rican Insurance about insurance solutions in Costa Rica.";
+  const description = post?.content?.rendered
+    ? (() => {
+        const text = stripHtml(post.content.rendered).replace(
+          /\[&hellip;\]/g,
+          "..."
+        );
+        return text.length > 160 ? text.slice(0, 160) + "..." : text;
+      })()
+    : "Read the latest blog from Costa Rican Insurance about insurance solutions in Costa Rica.";
 
   const url = `https://costaseo.vercel.app/blog/${blogTitle
     .replace(/\s+/g, "-")
