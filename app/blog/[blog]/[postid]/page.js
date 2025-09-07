@@ -215,10 +215,11 @@ export async function generateMetadata(props) {
   console.log(blogTitle, "blogTitle");
   const numericPostId = decodeURIComponent(params.postid);
   const postid = decodePostId(numericPostId);
+
   postID = postid;
   // Default metadata for when post is not found
   const defaultMetadata = {
-    title: blogTitle || "Costa Rican Insurance - Blog",
+    title: { absolute: blogTitle || "Costa Rican Insurance - Blog" },
     description:
       "Read the latest blog posts from Costa Rican Insurance about insurance solutions in Costa Rica.",
     alternates: { canonical: "https://costaseo.vercel.app" },
@@ -229,7 +230,9 @@ export async function generateMetadata(props) {
   };
 
   const post = await getpostdetails(postid);
-
+  if (!post) {
+    return defaultMetadata;
+  }
   // Extract data based on actual post structure
   const title = blogTitle;
   const description =
@@ -251,15 +254,16 @@ export async function generateMetadata(props) {
   return {
     //  FIXED: Proper title structure for Next.js
     title: {
-      absolute: title, // This ensures the exact title is used without template
+      absolute: blogTitle, // This ensures the exact title is used without template
     },
     description,
 
     // Essential meta tags
-    keywords: `${title}, Costa Rica, insurance, blog, mortgage, property`.slice(
-      0,
-      255
-    ),
+    keywords:
+      `${blogTitle}, Costa Rica, insurance, blog, mortgage, property`.slice(
+        0,
+        255
+      ),
     authors: [{ name: "Costa Rican Insurance" }],
 
     // Canonical link
