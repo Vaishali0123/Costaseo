@@ -175,15 +175,258 @@
 // export default async function Page({ params }) {
 //   return <BlogClient postid={params.postid} />;
 // }
+// import { getpostdetails } from "../../../lib/text";
+// import BlogClient from "../BlogClient";
+
+// function decodePostId(postId) {
+//   if (!postId) return null;
+//   if (/^\d+$/.test(postId)) {
+//     return Number(postId);
+//   }
+//   // if (typeof postId === "number") return postId;
+
+//   try {
+//     const decoded = atob(postId); // base64 → "post:143"
+//     const parts = decoded.split(":");
+//     const numeric = Number(parts.pop());
+//     return isNaN(numeric) ? null : numeric;
+//   } catch {
+//     return null;
+//   }
+// }
+
+// function stripHtml(html) {
+//   return html?.replace(/<[^>]*>?/gm, "") || "";
+// }
+
+// function createSlug(title) {
+//   return title
+//     .toLowerCase()
+//     .replace(/[^a-z0-9\s-]/g, "")
+//     .trim()
+//     .replace(/\s+/g, "-");
+// }
+// let postID = "";
+// export async function generateMetadata(props) {
+//   const params = await props.params;
+//   console.log(params, "params");
+//   const { blog } = params;
+
+//   const numericPostId = decodeURIComponent(params.postid);
+//   const postid = decodePostId(numericPostId);
+//   const post = postid ? await getpostdetails(postid) : null;
+//   const blogTitle = post?.title?.rendered
+//     ? post?.title?.rendered
+//     : decodeURIComponent(blog.replace(/-/g, " "));
+
+//   postID = postid;
+//   // Default metadata for when post is not found
+//   const defaultMetadata = {
+//     title: { absolute: blogTitle || "Costa Rican Insurance - Blog" },
+//     description:
+//       "Read the latest blog posts from Costa Rican Insurance about insurance solutions in Costa Rica.",
+//     alternates: { canonical: "https://costaseo.vercel.app" },
+//     robots: {
+//       index: true,
+//       follow: true,
+//     },
+//   };
+
+//   // if (!post) {
+//   //   return defaultMetadata;
+//   // }
+//   // Extract data based on actual post structure
+
+//   const description =
+//     stripHtml(post?.content?.rendered || "")
+//       .replace(/\[&hellip;\]/g, "...")
+//       .slice(0, 160) ||
+//     "Read the latest blog from Costa Rican Insurance about insurance solutions in Costa Rica.";
+
+//   const url = `https://costaseo.vercel.app/blog/${blogTitle.replace(
+//     /\s+/g,
+//     "-"
+//   )}/${params.postid}`;
+
+//   const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
+
+//   // You might need to fetch the actual media details separately
+//   // const featuredImage = featuredMediaId ? `https://costaricaninsurance.com/wp-content/uploads/...` : defaultImage;
+//   const featuredImage = defaultImage; // Update this when you have image URL logic
+
+//   return {
+//     //  FIXED: Proper title structure for Next.js
+//     title: {
+//       absolute: blogTitle, // This ensures the exact title is used without template
+//     },
+//     description,
+
+//     // Essential meta tags
+//     keywords:
+//       `${blogTitle}, Costa Rica, insurance, blog, mortgage, property`.slice(
+//         0,
+//         255
+//       ),
+//     authors: [{ name: "Costa Rican Insurance" }],
+
+//     // Canonical link
+//     alternates: { canonical: url },
+
+//     // OpenGraph meta tags
+//     openGraph: {
+//       title: blogTitle,
+//       description,
+//       url,
+//       siteName: "Costa Rican Insurance",
+//       locale: "en_US",
+//       type: "article",
+//       // publishedTime: post.date,
+//       // modifiedTime: post.modified,
+//       authors: ["Costa Rican Insurance"],
+//       section: "Insurance",
+//       // tags: post?.tags?.map((tag) => tag.name) || ["insurance", "Costa Rica"],
+//       images: [
+//         {
+//           url: featuredImage,
+//           width: 1200,
+//           height: 630,
+//           alt: blogTitle,
+//           type: "image/jpeg",
+//         },
+//       ],
+//     },
+
+//     // Twitter Card
+//     twitter: {
+//       card: "summary_large_image",
+//       title: blogTitle,
+//       description,
+//       creator: "@costaricanins",
+//       site: "@costaricanins",
+//       images: [featuredImage],
+//     },
+
+//     // Robots meta
+//     robots: {
+//       index: true,
+//       follow: true,
+//       googleBot: {
+//         index: true,
+//         follow: true,
+//         "max-video-preview": -1,
+//         "max-image-preview": "large",
+//         "max-snippet": -1,
+//       },
+//     },
+
+//     // Additional meta tags
+//     // other: {
+//     //   "article:published_time": post.date,
+//     //   "article:modified_time": post.modified,
+//     //   "article:author": "Costa Rican Insurance",
+//     //   "article:section": "Insurance",
+//     //   "og:updated_time": post.modified, // This helps with content freshness
+//     // },
+//   };
+// }
+
+// export default async function Page({ params }) {
+//   // const numericPostId = decodeURIComponent(params.postid);
+//   // const postid = decodePostId(numericPostId);
+//   // const post = await getpostdetails(postID);
+
+//   // // Generate structured data for this specific post
+//   // const generateStructuredData = () => {
+//   //   if (!post) return null;
+
+//   //   const title = stripHtml(post.title?.rendered || "");
+//   //   const description = stripHtml(post.excerpt?.rendered || "")
+//   //     .replace(/\[&hellip;\]/g, "...")
+//   //     .slice(0, 160);
+//   //   const slug = post?.slug || createSlug(title);
+//   //   const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
+//   //   const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
+
+//   //   // Get word count from content
+//   //   const contentText = stripHtml(post?.content?.rendered || "");
+//   //   const wordCount = contentText
+//   //     .split(/\s+/)
+//   //     .filter((word) => word.length > 0).length;
+
+//   //   return {
+//   //     "@context": "https://schema.org",
+//   //     "@type": "BlogPosting",
+//   //     "@id": url,
+//   //     headline: title,
+//   //     description,
+//   //     image: {
+//   //       "@type": "ImageObject",
+//   //       url: defaultImage,
+//   //       width: 1200,
+//   //       height: 630,
+//   //     },
+//   //     datePublished: post.date,
+//   //     dateModified: post.modified,
+//   //     author: {
+//   //       "@type": "Organization",
+//   //       name: "Costa Rican Insurance",
+//   //       url: "https://costaricaninsurance.com",
+//   //       logo: {
+//   //         "@type": "ImageObject",
+//   //         url: "https://costaricaninsurance.com/logo.png",
+//   //         width: 200,
+//   //         height: 60,
+//   //       },
+//   //     },
+//   //     publisher: {
+//   //       "@type": "Organization",
+//   //       name: "Costa Rican Insurance",
+//   //       url: "https://costaricaninsurance.com",
+//   //       logo: {
+//   //         "@type": "ImageObject",
+//   //         url: "https://costaricaninsurance.com/logo.png",
+//   //         width: 200,
+//   //         height: 60,
+//   //       },
+//   //     },
+//   //     mainEntityOfPage: {
+//   //       "@type": "WebPage",
+//   //       "@id": url,
+//   //     },
+//   //     articleSection: "Insurance",
+//   //     keywords: "insurance, Costa Rica, mortgage, property, qualify",
+//   //     wordCount: wordCount,
+//   //     articleBody:
+//   //       contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
+//   //     inLanguage: "en-US",
+//   //     isAccessibleForFree: true,
+//   //   };
+//   // };
+
+//   // const structuredData = generateStructuredData();
+
+//   return (
+//     <>
+//       {/* Structured Data (JSON-LD) */}
+//       {/* {structuredData && (
+//         <script
+//           type="application/ld+json"
+//           dangerouslySetInnerHTML={{
+//             __html: JSON.stringify(structuredData),
+//           }}
+//         />
+//       )} */}
+
+//       {/* Main Content */}
+//       <BlogClient postid={params.postid} />
+//     </>
+//   );
+// }
 import { getpostdetails } from "../../../lib/text";
-import BlogClient from "../BlogClient";
 
 function decodePostId(postId) {
   if (!postId) return null;
-  if (/^\d+$/.test(postId)) {
-    return Number(postId);
-  }
-  // if (typeof postId === "number") return postId;
+  if (/^\d+$/.test(postId)) return Number(postId);
 
   try {
     const decoded = atob(postId); // base64 → "post:143"
@@ -199,211 +442,142 @@ function stripHtml(html) {
   return html?.replace(/<[^>]*>?/gm, "") || "";
 }
 
-function createSlug(title) {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
-let postID = "";
-export async function generateMetadata(props) {
-  const params = await props.params;
-  console.log(params, "params");
-  const { blog } = params;
+export async function generateMetadata({ params }) {
+  const { blog, postid: encodedPostId } = params;
 
-  const numericPostId = decodeURIComponent(params.postid);
-  const postid = decodePostId(numericPostId);
-  const post = postid ? await getpostdetails(postid) : null;
+  const postId = decodePostId(decodeURIComponent(encodedPostId));
+  const post = postId ? await getpostdetails(postId) : null;
+
   const blogTitle = post?.title?.rendered
-    ? post?.title?.rendered
+    ? stripHtml(post.title.rendered)
     : decodeURIComponent(blog.replace(/-/g, " "));
 
-  postID = postid;
-  // Default metadata for when post is not found
-  const defaultMetadata = {
-    title: { absolute: blogTitle || "Costa Rican Insurance - Blog" },
-    description:
-      "Read the latest blog posts from Costa Rican Insurance about insurance solutions in Costa Rica.",
-    alternates: { canonical: "https://costaseo.vercel.app" },
-    robots: {
-      index: true,
-      follow: true,
-    },
-  };
-
-  // if (!post) {
-  //   return defaultMetadata;
-  // }
-  // Extract data based on actual post structure
-
   const description =
-    stripHtml(post?.content?.rendered || "")
+    stripHtml(post?.content?.rendered)
       .replace(/\[&hellip;\]/g, "...")
       .slice(0, 160) ||
     "Read the latest blog from Costa Rican Insurance about insurance solutions in Costa Rica.";
 
-  const url = `https://costaseo.vercel.app/blog/${blogTitle.replace(
-    /\s+/g,
-    "-"
-  )}/${params.postid}`;
+  const url = `https://costaseo.vercel.app/blog/${blogTitle
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9-]/g, "")}/${encodedPostId}`;
 
-  const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
-
-  // You might need to fetch the actual media details separately
-  // const featuredImage = featuredMediaId ? `https://costaricaninsurance.com/wp-content/uploads/...` : defaultImage;
-  const featuredImage = defaultImage; // Update this when you have image URL logic
+  const featuredImage =
+    post?.featured_media_url ||
+    "https://costaseo.vercel.app/default-blog-image.jpg";
 
   return {
-    //  FIXED: Proper title structure for Next.js
-    title: {
-      absolute: blogTitle, // This ensures the exact title is used without template
-    },
+    title: blogTitle,
     description,
-
-    // Essential meta tags
     keywords:
       `${blogTitle}, Costa Rica, insurance, blog, mortgage, property`.slice(
         0,
         255
       ),
-    authors: [{ name: "Costa Rican Insurance" }],
-
-    // Canonical link
     alternates: { canonical: url },
-
-    // OpenGraph meta tags
     openGraph: {
       title: blogTitle,
       description,
       url,
       siteName: "Costa Rican Insurance",
-      locale: "en_US",
       type: "article",
-      // publishedTime: post.date,
-      // modifiedTime: post.modified,
-      authors: ["Costa Rican Insurance"],
-      section: "Insurance",
-      // tags: post?.tags?.map((tag) => tag.name) || ["insurance", "Costa Rica"],
       images: [
         {
           url: featuredImage,
           width: 1200,
           height: 630,
           alt: blogTitle,
-          type: "image/jpeg",
         },
       ],
     },
-
-    // Twitter Card
     twitter: {
       card: "summary_large_image",
       title: blogTitle,
       description,
+      images: [featuredImage],
       creator: "@costaricanins",
       site: "@costaricanins",
-      images: [featuredImage],
     },
-
-    // Robots meta
     robots: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
     },
-
-    // Additional meta tags
-    // other: {
-    //   "article:published_time": post.date,
-    //   "article:modified_time": post.modified,
-    //   "article:author": "Costa Rican Insurance",
-    //   "article:section": "Insurance",
-    //   "og:updated_time": post.modified, // This helps with content freshness
-    // },
   };
 }
-
 export default async function Page({ params }) {
-  // const numericPostId = decodeURIComponent(params.postid);
-  // const postid = decodePostId(numericPostId);
-  // const post = await getpostdetails(postID);
+  const numericPostId = decodeURIComponent(params.postid);
+  const postid = decodePostId(numericPostId);
+  const post = await getpostdetails(postID);
 
-  // // Generate structured data for this specific post
-  // const generateStructuredData = () => {
-  //   if (!post) return null;
+  // Generate structured data for this specific post
+  const generateStructuredData = () => {
+    if (!post) return null;
 
-  //   const title = stripHtml(post.title?.rendered || "");
-  //   const description = stripHtml(post.excerpt?.rendered || "")
-  //     .replace(/\[&hellip;\]/g, "...")
-  //     .slice(0, 160);
-  //   const slug = post?.slug || createSlug(title);
-  //   const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
-  //   const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
+    const title = stripHtml(post.title?.rendered || "");
+    const description = stripHtml(post.excerpt?.rendered || "")
+      .replace(/\[&hellip;\]/g, "...")
+      .slice(0, 160);
+    const slug = post?.slug || createSlug(title);
+    const url = `https://costaseo.vercel.app/blog/${slug}/${params.postid}`;
+    const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
 
-  //   // Get word count from content
-  //   const contentText = stripHtml(post?.content?.rendered || "");
-  //   const wordCount = contentText
-  //     .split(/\s+/)
-  //     .filter((word) => word.length > 0).length;
+    // Get word count from content
+    const contentText = stripHtml(post?.content?.rendered || "");
+    const wordCount = contentText
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
 
-  //   return {
-  //     "@context": "https://schema.org",
-  //     "@type": "BlogPosting",
-  //     "@id": url,
-  //     headline: title,
-  //     description,
-  //     image: {
-  //       "@type": "ImageObject",
-  //       url: defaultImage,
-  //       width: 1200,
-  //       height: 630,
-  //     },
-  //     datePublished: post.date,
-  //     dateModified: post.modified,
-  //     author: {
-  //       "@type": "Organization",
-  //       name: "Costa Rican Insurance",
-  //       url: "https://costaricaninsurance.com",
-  //       logo: {
-  //         "@type": "ImageObject",
-  //         url: "https://costaricaninsurance.com/logo.png",
-  //         width: 200,
-  //         height: 60,
-  //       },
-  //     },
-  //     publisher: {
-  //       "@type": "Organization",
-  //       name: "Costa Rican Insurance",
-  //       url: "https://costaricaninsurance.com",
-  //       logo: {
-  //         "@type": "ImageObject",
-  //         url: "https://costaricaninsurance.com/logo.png",
-  //         width: 200,
-  //         height: 60,
-  //       },
-  //     },
-  //     mainEntityOfPage: {
-  //       "@type": "WebPage",
-  //       "@id": url,
-  //     },
-  //     articleSection: "Insurance",
-  //     keywords: "insurance, Costa Rica, mortgage, property, qualify",
-  //     wordCount: wordCount,
-  //     articleBody:
-  //       contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
-  //     inLanguage: "en-US",
-  //     isAccessibleForFree: true,
-  //   };
-  // };
+    return {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": url,
+      headline: title,
+      description,
+      image: {
+        "@type": "ImageObject",
+        url: defaultImage,
+        width: 1200,
+        height: 630,
+      },
+      datePublished: post.date,
+      dateModified: post.modified,
+      author: {
+        "@type": "Organization",
+        name: "Costa Rican Insurance",
+        url: "https://costaricaninsurance.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://costaricaninsurance.com/logo.png",
+          width: 200,
+          height: 60,
+        },
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Costa Rican Insurance",
+        url: "https://costaricaninsurance.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://costaricaninsurance.com/logo.png",
+          width: 200,
+          height: 60,
+        },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": url,
+      },
+      articleSection: "Insurance",
+      keywords: "insurance, Costa Rica, mortgage, property, qualify",
+      wordCount: wordCount,
+      articleBody:
+        contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
+      inLanguage: "en-US",
+      isAccessibleForFree: true,
+    };
+  };
 
-  // const structuredData = generateStructuredData();
+  const structuredData = generateStructuredData();
 
   return (
     <>
@@ -422,169 +596,3 @@ export default async function Page({ params }) {
     </>
   );
 }
-// import BlogClient from "../BlogClient";
-
-// // --- Utilities ---
-// import LZString from "lz-string";
-
-// function decodeBlogData(code) {
-//   try {
-//     const str = LZString.decompressFromEncodedURIComponent(code);
-//     return JSON.parse(str);
-//   } catch {
-//     return null;
-//   }
-// }
-
-// function stripHtml(html) {
-//   return html ? html.replace(/<[^>]*>?/gm, "").trim() : "";
-// }
-
-// function createSlug(title) {
-//   return title
-//     ? title
-//         .toLowerCase()
-//         .replace(/[^a-z0-9\s-]/g, "")
-//         .trim()
-//         .replace(/\s+/g, "-")
-//     : "";
-// }
-
-// // --- Generate Metadata (Server-only) ---
-// export async function generateMetadata({ params }) {
-//   console.log(params, "params");
-//   const { code } = params;
-
-//   console.log(code, "code");
-//   const decoded = decodeBlogData(code);
-//   console.log(decoded, "decoded");
-//   const data = decoded || {};
-//   const defaultTitle = "Costa Rican Insurance - Blog";
-//   const defaultDescription =
-//     "Read the latest blog posts from Costa Rican Insurance about insurance solutions in Costa Rica.";
-
-//   const title = data?.t || defaultTitle;
-//   const description = data?.d || defaultDescription;
-
-//   const url = `https://costaseo.vercel.app/blog/${code}`;
-
-//   return {
-//     title: { absolute: title },
-//     description,
-//     alternates: { canonical: url },
-//     openGraph: {
-//       title,
-//       description,
-//       url,
-//       siteName: "Costa Rican Insurance",
-//       type: "article",
-//       locale: "en_US",
-//       images: [
-//         {
-//           url: "https://costaseo.vercel.app/default-blog-image.jpg",
-//           width: 1200,
-//           height: 630,
-//           alt: title,
-//         },
-//       ],
-//     },
-//     twitter: {
-//       card: "summary_large_image",
-//       title,
-//       description,
-//       images: ["https://costaseo.vercel.app/default-blog-image.jpg"],
-//     },
-//     robots: { index: true, follow: true },
-//   };
-// }
-
-// // --- Page Component ---
-// export default async function Page({ params }) {
-//   const slug = params.blog; // slug is encoded JSON
-//   const data = decodeBlogData(slug);
-
-//   const postid = data?.p || null;
-//   let post = null;
-
-//   // try {
-//   //   if (postid) post = await getpostdetails(postid);
-//   // } catch (error) {
-//   //   console.error("Error loading post:", error);
-//   // }
-
-//   // --- Structured Data ---
-//   const generateStructuredData = () => {
-//     if (!post) return null;
-
-//     const title = stripHtml(post.title?.rendered || "");
-//     const description = stripHtml(post.excerpt?.rendered || "")
-//       .replace(/\[&hellip;\]/g, "...")
-//       .slice(0, 160);
-//     const url = `https://costaseo.vercel.app/blog/${slug}`;
-//     const defaultImage = "https://costaseo.vercel.app/default-blog-image.jpg";
-
-//     const contentText = stripHtml(post?.content?.rendered || "");
-//     const wordCount = contentText.split(/\s+/).filter(Boolean).length;
-
-//     return {
-//       "@context": "https://schema.org",
-//       "@type": "BlogPosting",
-//       "@id": url,
-//       headline: title,
-//       description,
-//       image: {
-//         "@type": "ImageObject",
-//         url: defaultImage,
-//         width: 1200,
-//         height: 630,
-//       },
-//       datePublished: post.date,
-//       dateModified: post.modified,
-//       author: {
-//         "@type": "Organization",
-//         name: "Costa Rican Insurance",
-//         url: "https://costaricaninsurance.com",
-//         logo: {
-//           "@type": "ImageObject",
-//           url: "https://costaricaninsurance.com/logo.png",
-//           width: 200,
-//           height: 60,
-//         },
-//       },
-//       publisher: {
-//         "@type": "Organization",
-//         name: "Costa Rican Insurance",
-//         url: "https://costaricaninsurance.com",
-//         logo: {
-//           "@type": "ImageObject",
-//           url: "https://costaricaninsurance.com/logo.png",
-//           width: 200,
-//           height: 60,
-//         },
-//       },
-//       mainEntityOfPage: { "@type": "WebPage", "@id": url },
-//       articleSection: "Insurance",
-//       keywords: "insurance, Costa Rica, mortgage, property, qualify",
-//       wordCount,
-//       articleBody:
-//         contentText.slice(0, 500) + (contentText.length > 500 ? "..." : ""),
-//       inLanguage: "en-US",
-//       isAccessibleForFree: true,
-//     };
-//   };
-
-//   const structuredData = generateStructuredData();
-
-//   return (
-//     <>
-//       {structuredData && (
-//         <script
-//           type="application/ld+json"
-//           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-//         />
-//       )}
-
-//       <BlogClient postid={postid} />
-//     </>
-//   );
-// }
