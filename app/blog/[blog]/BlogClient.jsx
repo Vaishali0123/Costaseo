@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 // import { useSearchParams } from "next/navigation";
-import ArticleRenderer from "../components/ArticleRenderer";
+import ArticleRenderer from "../../components/ArticleRenderer";
 import parse from "html-react-parser";
-import { GET_HERO_AND_STATS, graphQLClient } from "../lib/utils";
-import ShimmerCard from "../components/Shimmer";
-import { useLanguage } from "../context/LanguageContext";
-import Comments from "./components/Commets";
+import { GET_HERO_AND_STATS, graphQLClient } from "../../lib/utils";
+import ShimmerCard from "../../components/Shimmer";
+import { useLanguage } from "../../context/LanguageContext";
+import Comments from "../components/Commets";
 import Head from "next/head";
 
 function stripHtml(html) {
